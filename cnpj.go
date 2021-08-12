@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-
-
 func checksum(ds []int64, ref []int64) int64 {
 	var s int64
 	for i, n := range ref {
@@ -22,7 +20,7 @@ func checksum(ds []int64, ref []int64) int64 {
 }
 
 //IsValid checks whether CNPJ number is valid or not
-func  IsValid(n string) bool {
+func IsValid(n string) bool {
 	u := Unmask(n)
 	if len(u) != 14 {
 		return false
@@ -37,13 +35,13 @@ func  IsValid(n string) bool {
 		ds[i] = c
 	}
 
-	r1 := []int64{5,4,3,2,9,8,7,6,5,4,3,2}
-	r2 := []int64{6,5,4,3,2,9,8,7,6,5,4,3,2}
+	r1 := []int64{5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
+	r2 := []int64{6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2}
 	return checksum(ds, r1) == ds[12] && checksum(ds, r2) == ds[13]
 }
 
 //Mask returns the CNPJ number formatted
-func  Mask(n string) string {
+func Mask(n string) string {
 	u := Unmask(n)
 	if len(u) != 14 {
 		return n
@@ -52,6 +50,33 @@ func  Mask(n string) string {
 }
 
 //Unmask removes any non-digit (numeric) from the CNPJ number
-func  Unmask(n string) string {
+func Unmask(n string) string {
 	return regexp.MustCompile(`\D`).ReplaceAllString(n, "")
+}
+
+//Base returns the first 8 digits of the CNPJ number
+func Base(n string) string {
+	if !IsValid(n) {
+		return ""
+	}
+
+	return Unmask(n)[0:8]
+}
+
+//Order returns the 9th, 10th, 11th and 12th digits of the CNPJ number.
+func Order(n string) string {
+	if !IsValid(n) {
+		return ""
+	}
+
+	return Unmask(n)[8:12]
+}
+
+//CheckDigit returns the last 2 digits of the CNPJ number.
+func CheckDigit(n string) string {
+	if !IsValid(n) {
+		return ""
+	}
+
+	return Unmask(n)[12:14]
 }
