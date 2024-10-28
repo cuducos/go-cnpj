@@ -13,6 +13,7 @@ func TestMask(t *testing.T) {
 		{"11111111111111", "11.111.111/1111-11"},
 		{"123456", "123456"},
 		{"11223344556677889900", "11223344556677889900"},
+		{"12ABC34501DE35", "12.ABC.345/01DE-35"},
 	} {
 		if got := Mask(tc.cnpj); tc.expected != got {
 			t.Errorf("Mask(\"%s\") = %v; expected %s", tc.cnpj, got, tc.expected)
@@ -21,8 +22,16 @@ func TestMask(t *testing.T) {
 }
 
 func TestUnmask(t *testing.T) {
-	if got := Unmask("11.111.111/1111-11"); "11111111111111" != got {
-		t.Errorf("Unmask(\"11.111.111/1111-11\") = %v; want 11111111111111", got)
+	for _, tc := range []struct {
+		cnpj     string
+		expected string
+	}{
+		{"11.111.111/1111-11", "11111111111111"},
+		{"12.ABC.345/01DE-35", "12ABC34501DE35"},
+	} {
+		if got := Unmask(tc.cnpj); tc.expected != got {
+			t.Errorf("Unmask(\"%s\") = %v; want %s", tc.cnpj, got, tc.expected)
+		}
 	}
 }
 
@@ -35,11 +44,14 @@ func TestIsValid(t *testing.T) {
 		{"11.222.333/0001-81", true},
 		{"123", false},
 		{"11.111.111/1111-11", false},
+		{"12.ABC.345/01DE-35", true},
+		{"12ABC34501DE35", true},
+		{"12ABC34501DE42", false},
 		{"12.345.678 9012-34", false},
 		{"AB.CDE.FGH/IJKL-MN", false},
 	} {
 		if got := IsValid(tc.cnpj); tc.expected != got {
-			t.Errorf("IsValid(%v) = %v; expected %v", tc.cnpj, got, tc.expected)
+			t.Errorf("IsValid(\"%v\") = %v; expected %v", tc.cnpj, got, tc.expected)
 		}
 	}
 }
